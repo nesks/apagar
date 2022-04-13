@@ -1,16 +1,44 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+<div class="container">
+  <h1>notifications</h1>
+  <a @click="authenticate">Authenticate</a>
+</div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+
+import {getAuth, signInAnonymously} from 'firebase/auth'
+import {getMessaging, onMessage, getToken} from 'firebase/messaging'
+import {messaging} from '@/firebaseInit'
 
 export default {
   name: 'App',
-  components: {
-    HelloWorld
-  }
+  mounted(){
+    const messaging = getMessaging();
+
+    onMessage(messaging, (payload) =>{
+      console.log("message on client : ", payload);
+    });
+  },
+
+  methods:{
+      async authenticate(){
+        await signInAnonymously(getAuth());
+        this.activate();
+      },
+      async activate(){
+        const token = await getToken(messaging, {
+          vapidKey : 'BKj9Bbj6M58x3RIF5ikHppZ9VKtaKQSlZ4wIoSYA224wrRsUVL4iaGihXmTwkHAePKaniNLZ13rCDfpHMgg0LZo',
+        });
+
+        if(token){
+          console.log(token)
+        }else{
+           //request permission
+        }
+
+      }
+  }   
 }
 </script>
 
